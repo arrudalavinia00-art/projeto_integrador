@@ -93,21 +93,8 @@ app.get("/api/pecas", (req, res) => {
   res.json(pecas);
 });
 
-const PORT = 3000;
-
-app.listen(PORT, () => {
-  console.log(`
-========================================
- SERVIDOR DE RASTREABILIDADE ATIVO
-========================================
-
- API rodando em:
- http://localhost:${PORT}
-
- QR Codes disponíveis:
- - PEC001
- - PEC002
-
-========================================
-  `);
+app.listen(3000, '0.0.0.0', () => {
+    console.log('Servidor rodando na rede local!');
 });
+
+ 
