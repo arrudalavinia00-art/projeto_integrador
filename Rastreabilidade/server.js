@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
 const path = require("path");
 
 const app = express();
@@ -8,127 +9,115 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
-/*  NORMALIZAÇÃO */
-const normalize = (v) =>
-  (v || "")
+/* caminho do arquivo JSON (banco de dados) */
+const DB_PATH = path.join(__dirname, "pecas.json");
+
+/* ler peças do arquivo */
+function lerPecas() {
+  try {
+    const data = fs.readFileSync(DB_PATH, "utf-8");
+    return JSON.parse(data);
+  } catch (err) {
+    return []; // se der erro, retorna vazio
+  }
+}
+
+/* salvar peças no arquivo */
+function salvarPecas(dados) {
+  fs.writeFileSync(DB_PATH, JSON.stringify(dados, null, 2));
+}
+
+/* limpar ID vindo do QR code */
+function limparId(id) {
+  return (id || "")
     .toString()
+    .replace(/peca:|PEC:/gi, "")
     .trim()
-    .replace(/\s/g, "")
     .toUpperCase();
+}
 
-/* DADOS */
-let pecas = [
-  {
-    id: "PEC001",
-    lote: "LT2025",
-    dataFabricacao: "01/06/2025",
-    local: "Fundição",
-    horario: "08:30",
-    status: "Em Produção",
-    historico: [
-      { local: "Recebimento", horario: "07:50" },
-      { local: "Fundição", horario: "08:30" }
-    ]
-  },
-  {
-    id: "PEC002",
-    lote: "LT2025",
-    dataFabricacao: "01/06/2025",
-    local: "Usinagem",
-    horario: "09:10",
-    status: "Em Transporte",
-    historico: [
-      { local: "Fundição", horario: "08:15" },
-      { local: "Usinagem", horario: "09:10" }
-    ]
-  }
-];
-
-/* BUSCAR PEÇA */
+/* buscar peça pelo ID */
 app.get("/api/pecas/:id", (req, res) => {
-  try {
+  const pecas = lerPecas();
 
-    const idLimpo = normalize(req.params.id);
+  const id = limparId(req.params.id);
 
-    const peca = pecas.find(p =>
-      normalize(p.id) === idLimpo
-    );
+  const peca = pecas.find(p => p.id.toUpperCase() === id);
 
-    if (!peca) {
-      return res.status(404).json({ erro: "Peça não encontrada" });
-    }
-
-    return res.json(peca);
-
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ erro: "Erro interno" });
+  if (!peca) {
+    return res.status(404).json({ erro: "Peça não encontrada" });
   }
+
+  return res.json(peca);
 });
 
-/* ATUALIZAR PEÇA */
+/* atualizar peça e salvar histórico */
 app.put("/api/pecas/:id", (req, res) => {
-  try {
+  const pecas = lerPecas();
 
-    const idLimpo = normalize(req.params.id);
+  const id = limparId(req.params.id);
 
-    const peca = pecas.find(p =>
-      normalize(p.id) === idLimpo
-    );
+  const peca = pecas.find(p => p.id.toUpperCase() === id);
 
-    if (!peca) {
-      return res.status(404).json({ erro: "Peça não encontrada" });
-    }
-
-    const novoLocal = (req.body.local || "").trim();
-
-    if (!novoLocal) {
-      return res.status(400).json({ erro: "O local é obrigatório" });
-    }
-
-    /* HORÁRIO SEM SEGUNDOS */
-    const agora = new Date();
-    const novoHorario =
-      `${String(agora.getHours()).padStart(2, "0")}:` +
-      `${String(agora.getMinutes()).padStart(2, "0")}`;
-
-    /* ATUALIZA DADOS */
-    peca.local = novoLocal;
-    peca.horario = novoHorario;
-
-    /* STATUS AUTOMÁTICO */
-    const localLower = novoLocal.toLowerCase();
-
-    if (localLower.includes("fund")) {
-      peca.status = "Em Fundição";
-    } else if (localLower.includes("usin")) {
-      peca.status = "Em Usinagem";
-    } else if (localLower.includes("estoq")) {
-      peca.status = "Em Estoque";
-    } else if (localLower.includes("trans")) {
-      peca.status = "Em Transporte";
-    } else {
-      peca.status = "Em Processo";
-    }
-
-    /* HISTÓRICO */
-    peca.historico.push({
-      local: novoLocal,
-      horario: novoHorario
-    });
-
-    return res.json({
-      mensagem: "Peça atualizada com sucesso",
-      dados: peca
-    });
-
-  } catch (err) {
-    console.error("Erro no servidor:", err);
-    return res.status(500).json({ erro: "Erro interno no servidor" });
+  if (!peca) {
+    return res.status(404).json({ erro: "Peça não encontrada" });
   }
+
+  const novoLocal = (req.body.local || "").trim();
+
+  if (!novoLocal) {
+    return res.status(400).json({ erro: "Local obrigatório" });
+  }
+
+  const agora = new Date();
+
+  const horario = `${String(agora.getHours()).padStart(2, "0")}:${String(
+    agora.getMinutes()
+  ).padStart(2, "0")}`;
+
+  const data = agora.toLocaleDateString("pt-BR");
+
+  /* atualiza dados atuais da peça */
+  peca.local = novoLocal;
+  peca.horario = horario;
+
+  /* define status baseado no local */
+  const local = novoLocal.toLowerCase();
+
+  if (local.includes("fund")) {
+    peca.status = "Em Fundição";
+  } else if (local.includes("usin")) {
+    peca.status = "Em Usinagem";
+  } else if (local.includes("estoq")) {
+    peca.status = "Em Estoque";
+  } else if (local.includes("trans")) {
+    peca.status = "Em Transporte";
+  } else {
+    peca.status = "Em Processo";
+  }
+
+  /* garante que histórico existe */
+  if (!peca.historico) {
+    peca.historico = [];
+  }
+
+  /* adiciona novo registro no histórico */
+  peca.historico.push({
+    local: novoLocal,
+    horario,
+    data
+  });
+
+  /* salva tudo no arquivo */
+  salvarPecas(pecas);
+
+  return res.json({
+    mensagem: "Atualizado com sucesso",
+    dados: peca
+  });
 });
 
-/* SERVIDOR */
+/* inicia servidor */
 app.listen(3000, () => {
-  console.log("Servidor rodando na porta 3000!");
+  console.log("Servidor rodando em http://localhost:3000");
 });

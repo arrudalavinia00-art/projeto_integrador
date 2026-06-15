@@ -2,15 +2,14 @@
 <html lang="pt-BR">
 
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Sistema de Rastreabilidade Industrial</title>
 
 <link rel="stylesheet" href="style.css">
 
+<!-- Biblioteca QR Code -->
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 </head>
@@ -35,11 +34,10 @@
 
     </div>
 
+    <!-- SCANNER -->
     <div class="scanner-card">
 
-        <h2>
-            Leitura de QR Code
-        </h2>
+        <h2>Leitura de QR Code</h2>
 
         <p class="descricao">
             Escaneie o QR Code da peça para consultar informações de produção, localização e movimentação no processo industrial.
@@ -49,6 +47,7 @@
 
     </div>
 
+    <!-- AÇÕES -->
     <div class="acoes">
 
         <input 
@@ -63,11 +62,10 @@
 
     </div>
 
+    <!-- RESULTADO -->
     <div id="resultado">
 
-        <h2>
-            Informações da Peça
-        </h2>
+        <h2>Informações da Peça</h2>
 
         <p>
             Aguarde a leitura de um QR Code para visualizar os dados de rastreabilidade.
@@ -77,6 +75,7 @@
 
 </div>
 
+<!-- SCRIPT PRINCIPAL -->
 <script src="script.js"></script>
 
 </body>
