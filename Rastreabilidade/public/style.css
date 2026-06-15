@@ -8,6 +8,7 @@ body {
 }
 
 /* CONTAINER */
+
 .container {
     max-width: 1200px;
     margin: auto;
@@ -15,12 +16,14 @@ body {
 }
 
 /* TOPO */
+
 .topo {
     text-align: center;
     margin-bottom: 50px;
 }
 
-/* NOME EMPRESA */
+/* EMPRESA */
+
 .empresa {
     color: #ff8a00;
     font-size: 1rem;
@@ -29,7 +32,8 @@ body {
     font-weight: 800;
 }
 
-/* TÍTULO PRINCIPAL */
+/* TÍTULO */
+
 h1 {
     font-size: 3.2rem;
     margin-bottom: 15px;
@@ -40,12 +44,14 @@ h1 {
 }
 
 /* SUBTÍTULO */
+
 .subtitulo {
     color: #94a3b8;
     font-size: 1.15rem;
 }
 
-/* CARD PRINCIPAL */
+/* CARD */
+
 .scanner-card {
     background: rgba(10, 25, 47, 0.7);
     border: 1px solid rgba(0, 140, 255, 0.2);
@@ -56,6 +62,7 @@ h1 {
 }
 
 /* TÍTULO CARD */
+
 .scanner-card h2 {
     font-size: 1.8rem;
     margin-bottom: 15px;
@@ -64,6 +71,7 @@ h1 {
 }
 
 /* DESCRIÇÃO */
+
 .descricao {
     color: #cbd5e1;
     line-height: 1.7;
@@ -71,7 +79,8 @@ h1 {
     margin-bottom: 30px;
 }
 
-/* ÁREA DO LEITOR */
+/* LEITOR */
+
 #reader {
     width: 100%;
     max-width: 650px;
@@ -84,84 +93,121 @@ h1 {
 }
 
 /* ÍCONE */
+
 #reader img {
     filter: brightness(0) invert(1);
     opacity: 0.8;
 }
 
-/* BOTÕES INTERNOS DA CÂMERA */
+/* BOTÕES DO LEITOR */
+
 #reader button {
     background: transparent !important;
-    color: #ff9f43 !important;
     border: 2px solid #ff9f43 !important;
     border-radius: 8px !important;
     padding: 12px 26px !important;
     font-size: 1rem !important;
     font-weight: 700;
-    text-transform: uppercase;
     transition: all 0.3s ease;
     cursor: pointer;
+    color: transparent !important;
+    position: relative;
 }
+
+/* TEXO BOTÃO SOLICITAR */
+
+#html5-qrcode-button-camera-start::before {
+    content: "Solicitar câmera";
+
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ff9f43;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* TEXTO BOTÃO VOLTAR */
+
+#html5-qrcode-button-camera-stop::before {
+    content: "Voltar";
+
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ff9f43;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* HOVER BOTÕES */
 
 #reader button:hover {
     background: #ff9f43 !important;
-    color: #0a192f !important;
-    box-shadow: 0 0 15px rgba(255, 159, 67, 0.5);
     transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(255, 159, 67, 0.5);
 }
 
-/* TEXTOS DINÂMICOS DA CÂMERA */
-#reader__dashboard_section_csr button,
-#html5-qrcode-button-camera-start,
-#html5-qrcode-button-camera-stop {
-    font-size: 0 !important;
+#reader button:hover::before {
+    color: #0a192f;
 }
 
-#html5-qrcode-button-camera-start::after {
-    content: "Solicitar câmera";
-    font-size: 1rem;
-}
-
-#html5-qrcode-button-camera-stop::after {
-    content: "Retornar";
-    font-size: 1rem;
-}
-
-#reader__dashboard_section_csr button:not(#html5-qrcode-button-camera-stop)::after {
-    content: "Solicitar câmera";
-    font-size: 1rem;
-}
+/* LINK ESCANEAR IMAGEM */
 
 #reader__dashboard_section_swaplink {
     font-size: 0 !important;
 }
 
 #reader__dashboard_section_swaplink::after {
-    content: "Voltar";
+    content: "Escanear imagem";
     font-size: 1rem;
     color: #008cff;
     text-decoration: underline;
+    cursor: pointer;
 }
+
+/* INPUT IMAGEM */
 
 #reader__filescan_input {
     color: transparent !important;
 }
 
+/* BOTÃO INPUT */
+
 #reader__filescan_input::before {
     content: "Selecionar imagem";
     color: #ffffff;
     font-size: 1rem;
+    font-weight: 600;
 }
 
+/* TEXTO ARRASTAR */
+
 #reader__scan_region::after {
-    content: "Ou arraste uma imagem para leitura";
+    content: "Ou arraste uma imagem com QR Code para leitura";
     display: block;
     text-align: center;
     margin-top: 20px;
     color: #94a3b8;
+    font-size: 1rem;
 }
 
-/* SEÇÃO DE AÇÕES */
+/* LINKS */
+
+#reader a {
+    color: #008cff !important;
+}
+
+/* AÇÕES */
+
 .acoes {
     margin-top: 40px;
     display: flex;
@@ -171,6 +217,7 @@ h1 {
 }
 
 /* INPUT */
+
 input {
     width: 350px;
     padding: 16px;
@@ -194,6 +241,7 @@ input::placeholder {
 }
 
 /* BOTÃO PRINCIPAL */
+
 button {
     padding: 16px 32px;
     border: none;
@@ -212,7 +260,8 @@ button:hover {
     box-shadow: 0 6px 25px rgba(255, 138, 0, 0.6);
 }
 
-/* CARD DE RESULTADOS */
+/* RESULTADO */
+
 #resultado {
     margin-top: 40px;
     background: rgba(10, 25, 47, 0.7);

@@ -1,48 +1,92 @@
+
 let idAtual = null;
 
+/*  LIMPAR QR CODE */
+function limparQR(texto) {
+    return (texto || "")
+        .toString()
+        .replace("peca:", "")
+        .replace("PEC:", "")
+        .trim()
+        .toUpperCase();
+}
+
+/*  EXIBIR PEÇA */
 function exibirPeca(peca){
 
+    let historicoHTML = "";
+
+    peca.historico
+    .slice()
+    .reverse()
+    .forEach(item => {
+
+        historicoHTML += `
+            <tr>
+                <td>${item.horario}</td>
+                <td>${item.local}</td>
+            </tr>
+        `;
+    });
+
     document.getElementById("resultado").innerHTML = `
-        <h2> Dados da Peça</h2>
+        <h2>Dados da Peça</h2>
 
         <p><strong>Número:</strong> ${peca.id}</p>
-
         <p><strong>Lote:</strong> ${peca.lote}</p>
-
         <p><strong>Data de Fabricação:</strong> ${peca.dataFabricacao}</p>
-
         <p><strong>Local Atual:</strong> ${peca.local}</p>
-
         <p><strong>Última Atualização:</strong> ${peca.horario}</p>
+        <p><strong>Status:</strong> ${peca.status}</p>
 
-        <p><strong>Status:</strong> Em Produção</p>
+        <div class="historico-container">
+            <h3>Histórico de Movimentação</h3>
+
+            <table class="tabela-historico">
+                <thead>
+                    <tr>
+                        <th>Horário</th>
+                        <th>Local</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${historicoHTML}
+                </tbody>
+            </table>
+        </div>
     `;
 }
 
+/* BUSCAR PEÇA */
 async function buscarPeca(id){
 
     try{
 
-        const resposta = await fetch(`/api/pecas/${id}`);
+        const idLimpo = limparQR(id);
+
+        const resposta = await fetch(`/api/pecas/${idLimpo}`);
 
         if(!resposta.ok){
+            const erro = await resposta.json();
+            console.log(erro);
             throw new Error();
         }
 
         const dados = await resposta.json();
 
-        idAtual = id;
+        idAtual = idLimpo;
 
         exibirPeca(dados);
 
         tocarSom();
 
-    }catch{
-
+    }catch(error){
+        console.log(error);
         alert("Peça não encontrada");
     }
 }
 
+/* ATUALIZAR LOCAL */
 async function atualizarLocal(){
 
     if(!idAtual){
@@ -59,15 +103,19 @@ async function atualizarLocal(){
 
     try{
 
-        const resposta = await fetch(`/api/pecas/${idAtual}`,{
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json"
+        const resposta = await fetch(`/api/pecas/${idAtual}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
             },
-            body:JSON.stringify({
-                local
-            })
+            body: JSON.stringify({ local })
         });
+
+        if(!resposta.ok){
+            const erro = await resposta.json();
+            console.log(erro);
+            throw new Error();
+        }
 
         const dados = await resposta.json();
 
@@ -75,37 +123,40 @@ async function atualizarLocal(){
 
         document.getElementById("local").value = "";
 
-        alert("Rastreabilidade atualizada com sucesso!");
+        alert("Movimentação registrada com sucesso!");
 
-    }catch{
-
+    }catch(error){
+        console.log(error);
         alert("Erro ao atualizar localização");
     }
 }
 
+/* LEITOR QR CODE */
 function iniciarLeitor(){
 
     const leitor = new Html5QrcodeScanner(
         "reader",
         {
-            fps:10,
-            qrbox:250
+            fps: 10,
+            qrbox: 250
         }
     );
 
-    leitor.render((textoLido)=>{
+    leitor.render((textoLido) => {
 
         leitor.clear();
 
+        // IMPORTANTE
         buscarPeca(textoLido);
 
-        setTimeout(()=>{
+        setTimeout(() => {
             iniciarLeitor();
-        },2000);
+        }, 2000);
 
     });
 }
 
+/* SOM */
 function tocarSom(){
 
     const audio = new Audio(
@@ -117,8 +168,7 @@ function tocarSom(){
 
 iniciarLeitor();
 
-/* TRADUÇÃO DO LEITOR */
-
+/* TRADUÇÃO DO SCANNER */
 setTimeout(() => {
 
     const trocarCamera = document.getElementById(
@@ -134,10 +184,7 @@ setTimeout(() => {
     );
 
     if(inputImagem){
-        inputImagem.setAttribute(
-            "title",
-            "Selecionar imagem"
-        );
+        inputImagem.setAttribute("title", "Selecionar imagem");
     }
 
     const textos = document.querySelectorAll("#reader div");
@@ -145,18 +192,15 @@ setTimeout(() => {
     textos.forEach(texto => {
 
         if(texto.innerText.includes("Or drop an image to scan")){
-            texto.innerText =
-            "Ou arraste uma imagem para leitura";
+            texto.innerText = "Ou arraste uma imagem para leitura";
         }
 
         if(texto.innerText.includes("Choose Image")){
-            texto.innerText =
-            "Selecionar imagem";
+            texto.innerText = "Selecionar imagem";
         }
 
         if(texto.innerText.includes("Scan using camera directly")){
-            texto.innerText =
-            "Usar câmera";
+            texto.innerText = "Usar câmera";
         }
 
     });
