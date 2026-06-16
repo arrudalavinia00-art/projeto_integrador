@@ -18,7 +18,7 @@ function lerPecas() {
     const data = fs.readFileSync(DB_PATH, "utf-8");
     return JSON.parse(data);
   } catch (err) {
-    return []; // se der erro, retorna vazio
+    return [];
   }
 }
 
@@ -117,7 +117,9 @@ app.put("/api/pecas/:id", (req, res) => {
   });
 });
 
-/* inicia servidor */
-app.listen(3000, () => {
-  console.log("Servidor rodando em http://localhost:3000");
+/* inicia servidor acessível na rede */
+app.listen(3000, "0.0.0.0", () => {
+  console.log("Servidor rodando em:");
+  console.log("http://localhost:3000");
+  console.log("http://IP-DA-SUA-REDE:3000 (use no celular)");
 });
